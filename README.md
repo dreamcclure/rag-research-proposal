@@ -2,7 +2,7 @@
 
 > A Retrieval-Augmented Generation (RAG) system that helps a university research office turn a
 > federal **Notice of Funding Opportunity (NOFO)** into a first-draft grant concept note — a task
-> that normally takes 110–140 hours — in minutes, with a human kept firmly in the loop.
+> that normally takes **110–140 hours** — in minutes, with a human kept firmly in the loop.
 
 ![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
 ![LangChain](https://img.shields.io/badge/LangChain-orchestration-1C3C3C)
@@ -14,36 +14,54 @@
 
 ### 📂 What to look at
 - **[`research_proposal_rag.ipynb`](research_proposal_rag.ipynb)** — the executed notebook (prompts + code + outputs). *GitHub renders it in your browser — no setup needed.*
-- **[`Research_Proposal_First_Draft.pdf`](Research_Proposal_First_Draft.pdf)** — the AI-generated concept note (the deliverable).
+- **[`Research_Proposal_First_Draft.pdf`](Research_Proposal_First_Draft.pdf)** — the AI-generated 10-page concept note (the deliverable).
 
 ---
 
-## What it does (end-to-end)
+## 🧭 How it works
 
+```mermaid
+flowchart TD
+    A["NOFO funding notice (PDF)"] --> B["1 · Extract the central funding topic"]
+    B --> C["2 · Semantic search over a ~3,000-paper archive<br/>OpenAI embeddings → Chroma · 9,102 chunks → retrieve top 50"]
+    C --> D["3 · Summarize each relevant paper<br/>relevance · contributions · limitations · gaps"]
+    D --> E["4 · Generate 5 funding-aligned research ideas → pick one"]
+    E --> F["5 · Draft a structured concept note<br/>grounded in the cited paper + NOFO · anti-fabrication guardrails"]
+    F --> G["6 · LLM rubric scores the draft (advisory only)"]
+    G --> H["7–8 · Human review + final decision"]
 ```
-NOFO (funding notice PDF)
-      │
-      ▼
-1. Extract the central funding topic                      → "Digital mental health interventions"
-      │
-      ▼
-2. Semantic search over a ~3,000-paper archive           → OpenAI embeddings + Chroma vector DB
-      │  (chunk → embed → store → retrieve top 50)           9,102 chunks; 11 relevant papers ranked
-      ▼
-3. Summarize each relevant paper                          → relevance, contributions, limitations, gaps
-      │
-      ▼
-4. Generate 5 funding-aligned research ideas             → pick one (chose the biomarker idea)
-      │
-      ▼
-5. Draft a structured concept note from a template       → grounded in the cited paper + NOFO
-      │  (with guardrails: no fake budgets/credentials)      saved as a PDF deliverable
-      ▼
-6. LLM rubric scores the draft (advisory only)           → Innovation 4 · Significance 4 · Approach 3
-      │                                                       · Investigator Expertise 1 · Overall 3
-      ▼
-7 & 8. Human review + recommendations                    → final judgment stays with people
-```
+
+## 📊 Results at a glance
+
+| Papers in archive | Chunks embedded | Retrieved | Judged relevant | Output |
+|:---:|:---:|:---:|:---:|:---:|
+| ~3,000 | **9,102** | top 50 | **11 papers** | a 10-page concept note |
+
+**Extracted funding topic:** *“Digital mental health interventions”*
+**Advisory rubric score:** Innovation **4** · Significance **4** · Approach **3** · Investigator Expertise **1\*** · Overall **3**
+<sub>\*Scored 1 *honestly* — a concept note contains no investigator biosketches, so the evaluator flagged "insufficient info" rather than inventing qualifications.</sub>
+
+## 📄 The generated deliverable
+
+From a funding notice, the pipeline produced a complete, structured grant concept note —
+*“Biomarker-Guided Personalization of a Digital Substance-Use Mental Health Intervention”* — mapped
+to the NIMH NOFO (PAR-25-136), with a staged clinical-trial design. First two pages:
+
+<p align="center">
+  <img src="assets/concept-note-p1.png" width="46%" alt="Concept note page 1 — title and introduction">
+  <img src="assets/concept-note-p2.png" width="46%" alt="Concept note page 2 — problem statement">
+</p>
+
+**The research idea it selected (grounded in a real retrieved paper):**
+
+> **Biomarker-Guided Personalization of a Digital Substance-Use Mental Health Intervention** —
+> test whether webcam-based eye-tracking and facial-expression signals can safely guide
+> personalization of an existing evidence-based digital intervention, comparing biomarker-guided
+> care against the same intervention without personalization.
+> **Cited paper:** *White Paper — Brain Gaze* · **NOFO alignment:** multimodal behavioral data,
+> mechanism validation beyond a primary effectiveness trial, privacy/safety, regulatory consultation.
+
+---
 
 ## Why RAG instead of keyword search
 The university's earlier keyword-tagging pilot failed: people tagged inconsistently, compliance
@@ -62,7 +80,7 @@ has to be tagged by hand.
 | PDF handling | `pypdf`, `markdown-pdf` |
 | Token budgeting | `tiktoken` |
 
-## The 5 prompts that drive it (the graded core)
+## The 5 prompts that drive it (the engineered core)
 1. **Topic extraction** — returns the single funding topic as a short phrase, grounded in the NOFO.
 2. **Paper summary** — analyzes each paper for relevance/contributions/limitations/gaps; says
    "insufficient info" rather than inventing.
