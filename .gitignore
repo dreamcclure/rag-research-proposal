@@ -1,0 +1,23 @@
+# Secrets — never commit API keys
+.env
+
+# Large provided research corpus (~132 MB) — not committed
+Project_Files.zip
+*.zip
+
+# Local Chroma vector store / DB if the notebook is re-run
+chroma/
+*.sqlite3
+*.sqlite
+
+# Notebook + Python cruft
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Environments
+.venv/
+venv/
+
+# macOS
+.DS_Store

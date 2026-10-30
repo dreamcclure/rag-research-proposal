@@ -1,0 +1,10 @@
+# RAG Research-Proposal Pipeline — pinned dependencies (from the Colab notebook)
+langchain==0.3.26
+langchain-core==0.3.68
+langchain-openai==0.3.27
+langchain-community==0.3.20
+langchain-chroma==0.2.4
+chromadb==1.5.9
+pypdf==5.4.0
+tiktoken==0.14.0
+markdown-pdf==1.7
